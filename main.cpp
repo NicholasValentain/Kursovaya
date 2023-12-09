@@ -341,7 +341,6 @@ public:
         file >> currentNode;
         if (file.eof()) return;
 
-
         for (int i = 0; i < nums; i++)
         {
             file.clear();
@@ -356,7 +355,6 @@ public:
                 ListNode<T> secondNode;
 
                 long prevsecond = 0;
-
                 long firstNodeStart = head;
                 long firstNodeEnd = 0;
                 long secondNodeStart = head;
@@ -364,12 +362,9 @@ public:
                 int k = 0;
                 while (k <= j)
                 {
-
                     if (k > 1) prevsecond = secondNodeEnd - sizeof(long);
 
                     secondNode = firstNode;
-
-
 
                     secondNodeStart = firstNodeStart;
                     secondNodeEnd = firstNodeEnd;
@@ -386,39 +381,14 @@ public:
                     file.seekp(secondNodeEnd - sizeof(long), std::ios::beg);
                     file.write(reinterpret_cast<const char*>(&pos), sizeof(long));
 
-
-
                     file.seekp(prevsecond, std::ios::beg);
                     file.write(reinterpret_cast<const char*>(&firstNodeStart), sizeof(long));
 
-
-
                     file.seekp(firstNodeEnd - sizeof(long), std::ios::beg);
                     file.write(reinterpret_cast<const char*>(&secondNodeStart), sizeof(long));
-
-
-                    /*if (secondNodeStart == head)
-                    {
-                        head = firstNodeStart;
-                    }*/
-
                 }
             }
         }
-
-
-
-
-        //for (int i = 0; i < 10; i++) {
-        //    for (int j = 1; j < 10; j++) {
-        //        if (digitals[j] < digitals[j - 1]) {
-        //            int b = digitals[j]; // создали дополнительную переменную
-        //            digitals[j] = digitals[j - 1]; // меняем местами
-        //            digitals[j - 1] = b; // значения элементов
-        //        }
-        //    }
-        //}
-
     }
 
     // Метод для обновления файла
