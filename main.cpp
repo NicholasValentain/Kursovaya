@@ -83,17 +83,22 @@ public:
     // Конструктор
     BinaryFile(const char* filename) : file(filename, std::ios::binary | std::ios::in | std::ios::out)
     {
-        headPointer = -1; // По умолчанию первого элемента нет
-        nums = 0; // Элементов нет
+
+        //nums = 0; // Элементов нет
         this->filename = filename; // Копируем заданное название
         if (!file.is_open()) // Создание файла, если он не существует
         {
             file.open(filename, std::ios::binary | std::ios::out);
             file.close();
             file.open(filename, std::ios::binary | std::ios::in | std::ios::out);
+            headPointer = -1; // По умолчанию первого элемента нет
+            file.seekg(0, std::ios::beg);// Устанавливаем указатель на начало файла
         }
-        // Устанавливаем указатель на начало файла
-        file.seekg(0, std::ios::beg);
+        else
+        {
+            file.seekg(0, std::ios::beg);// Устанавливаем указатель на начало файла
+            file.read(reinterpret_cast<char*>(&headPointer), sizeof(long));
+        }
     }
 
     // Деструктор
@@ -116,7 +121,7 @@ public:
             headPointer = currentPosition;
             file.seekg(0, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
-            nums++;
+            //nums++;
         }
         else
         {
@@ -150,7 +155,7 @@ public:
                 file << node; // Используем оператор << для записи элемента списка в файл
                 file.seekp(prevNextPosition, std::ios::beg);
                 file.write(reinterpret_cast<const char*>(&currentPosition), sizeof(long));
-                nums++;
+                //nums++;
                 return;
             }
             long NextPosition = file.tellp(); // Старая ссылка предшествующего элемента
@@ -160,7 +165,7 @@ public:
             file << node; // Используем оператор << для записи элемента списка в файл
             file.seekp(prevNextPosition, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&currentPosition), sizeof(long));
-            nums++;
+            //nums++;
         }
     }
 
@@ -193,7 +198,7 @@ public:
             file << node; // Используем оператор << для записи элемента списка в файл
             file.seekp(prevNextPosition, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&currentPosition), sizeof(long));
-            nums++;
+            //nums++;
         }
         if (headPointer == -1) {
             // Если это первый элемент, обновляем указатель на начало списка
@@ -201,7 +206,7 @@ public:
             file.seekg(0, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
             file << node; // Используем оператор << для записи элемента списка в файл
-            nums++;
+            //nums++;
         }
     }
 
@@ -231,7 +236,7 @@ public:
             file.seekg(0, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&deletenextPointer), sizeof(long));
             headPointer = deletenextPointer;
-            nums--;
+            //nums--;
         }
         else
         {
@@ -263,7 +268,7 @@ public:
             long newlastPointer = currentNode.get_nextPointer();
             file.seekp(prevPosition - sizeof(long), std::ios::beg);
             file.write(reinterpret_cast<const char*>(&newlastPointer), sizeof(long));
-            nums--;
+            //nums--;
         }
     }
 
@@ -293,7 +298,7 @@ public:
             file >> currentNode;
             prevNextPosition = file.tellg();
             file.seekg(currentNode.get_nextPointer(), std::ios::beg);
-            num++;
+            //num++;
         }
         file.clear();
         if (currentPosition == -1)
@@ -311,7 +316,7 @@ public:
             headPointer = -1;
             file.seekp(0, std::ios::beg);
             file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
-            nums--;
+            //nums--;
         }
         else // Обновляем ссылку предпоследнего элемента
         {
@@ -321,7 +326,7 @@ public:
             file.seekp(prevPosition - sizeof(long), std::ios::beg);
             long newlastPointer = -1;
             file.write(reinterpret_cast<const char*>(&newlastPointer), sizeof(long));
-            nums--;
+            //nums--;
         }
     }
 
@@ -337,9 +342,19 @@ public:
         file.seekg(0, std::ios::beg); // Ищем первый элемент
         long head = -1;
         file.read(reinterpret_cast<char*>(&head), sizeof(long));
-        file.seekg(head, std::ios::beg); // Перемещаем указатель в начало списка
+
         file >> currentNode;
         if (file.eof()) return;
+
+        int nums = 1;
+        while (!file.eof() && file.tellg() != -1)
+        {
+            file >> currentNode;
+            file.seekg(currentNode.get_nextPointer(), std::ios::beg);
+            nums++;
+        }
+        file.clear();
+        file.seekg(head, std::ios::beg); // Перемещаем указатель в начало списка
 
         for (int i = 0; i < nums; i++)
         {
@@ -365,7 +380,6 @@ public:
                     if (k > 1) prevsecond = secondNodeEnd - sizeof(long);
 
                     secondNode = firstNode;
-
                     secondNodeStart = firstNodeStart;
                     secondNodeEnd = firstNodeEnd;
                     firstNodeStart = file.tellg();
@@ -484,14 +498,14 @@ public:
                 std::cout << node.get_data() << std::endl;
             }
         }
-        std::cout << std::endl;
         //std::cout << nums << std::endl;
+        std::cout << std::endl;
     }
 
 private:
     std::fstream file; // Файл для списка
     long headPointer; // Указатель на начало списка
-    int nums; // Число элементов
+    //int nums; // Число элементов
     const char* filename; // Имя файла
 };
 
