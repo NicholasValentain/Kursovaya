@@ -346,7 +346,14 @@ public:
         file >> currentNode;
         if (file.eof()) return;
 
-        int nums = 1;
+
+        file.clear(); // ќчистка файла от ссылок
+        file.seekg(0, std::ios::beg); // »щем первый элемент
+        head = -1;
+        file.read(reinterpret_cast<char*>(&head), sizeof(long));
+
+
+        int nums = 0;
         while (!file.eof() && file.tellg() != -1)
         {
             file >> currentNode;
