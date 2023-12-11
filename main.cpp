@@ -111,7 +111,11 @@ public:
         ListNode<T> node;
         node.set_data(obj); // Задаём данные
         node.set_size(obj); // Задаём размер данных
-
+        if (index < 0)
+        {
+            std::cerr << "Index out of bounds" << std::endl;
+            return;
+        }
         if (index == 0) // Если это первый элемент
         {
             file.seekp(0, std::ios::end);
@@ -216,7 +220,11 @@ public:
         file.clear();
         file.seekg(0, std::ios::beg);
         ListNode<T> deleteNode;
-
+        if (index < 0)
+        {
+            std::cerr << "Index out of bounds" << std::endl;
+            return;
+        }
         if (index == 0)
         {
             file.clear();
