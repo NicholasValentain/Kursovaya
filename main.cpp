@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <cstdio>
 #include <stdexcept>
 
@@ -116,16 +117,28 @@ public:
             std::cerr << "Index out of bounds" << std::endl;
             return;
         }
-        if (index == 0) // Если это первый элемент
+        if (index == 0) // Если это 0 элемент
         {
-            file.seekp(0, std::ios::end);
-            long currentPosition = file.tellp(); // Запоминаем позицию конца файла
-            node.set_nextPointer(headPointer);
-            file << node; // Используем оператор << для записи элемента списка в файл
-            headPointer = currentPosition;
-            file.seekg(0, std::ios::beg);
-            file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
-            //nums++;
+            if (headPointer == -1) {
+                file.clear();
+                // Если это первый элемент, обновляем указатель на начало списка
+                headPointer = 4;
+                file.seekg(0, std::ios::beg);
+                file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
+                file << node; // Используем оператор << для записи элемента списка в файл
+            }
+            else
+            {
+                file.clear();
+                file.seekp(0, std::ios::end);
+                long currentPosition = file.tellp(); // Запоминаем позицию конца файла
+                node.set_nextPointer(headPointer);
+                file << node; // Используем оператор << для записи элемента списка в файл
+                headPointer = currentPosition;
+                file.seekg(0, std::ios::beg);
+                file.write(reinterpret_cast<const char*>(&headPointer), sizeof(long));
+                //nums++;
+            }
         }
         else
         {
@@ -306,7 +319,7 @@ public:
             file >> currentNode;
             prevNextPosition = file.tellg();
             file.seekg(currentNode.get_nextPointer(), std::ios::beg);
-            //num++;
+            num++;
         }
         file.clear();
         if (currentPosition == -1)
@@ -359,7 +372,7 @@ public:
         file.seekg(0, std::ios::beg); // Ищем первый элемент
         head = -1;
         file.read(reinterpret_cast<char*>(&head), sizeof(long));
-
+        file.seekg(head, std::ios::beg);
 
         int nums = 0;
         while (!file.eof() && file.tellg() != -1)
@@ -418,6 +431,7 @@ public:
                 }
             }
         }
+        file.clear();
     }
 
     // Метод для обновления файла
@@ -544,14 +558,16 @@ void menu(BinaryFile<std::string>& binFile, int& num)
     {
     case 1:
         std::cout << "Введите данные: ";
-        std::cin >> value;
+        std::getline(std::cin, value);
+        std::getline(std::cin, value);
         binFile.addObject(value);
         break;
     case 2:
         std::cout << "Введите позицию: ";
         std::cin >> position;
         std::cout << "Введите данные: ";
-        std::cin >> value;
+        std::getline(std::cin, value);
+        std::getline(std::cin, value);
         binFile.addObjectToPos(value, position);
         break;
     case 3:
